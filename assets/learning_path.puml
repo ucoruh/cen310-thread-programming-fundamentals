@@ -1,0 +1,117 @@
+@startuml learning_path
+
+title Thread Programming Learning Path
+
+skinparam {
+    ArrowColor #2E86C1
+    ActorBorderColor #2E86C1
+    ActorBackgroundColor #D6EAF8
+    ActivityBorderColor #2E86C1
+    ActivityBackgroundColor #D6EAF8
+    ActivityDiamondBorderColor #2E86C1
+    ActivityDiamondBackgroundColor #D6EAF8
+    NoteBackgroundColor #FCF3CF
+    NoteBorderColor #F1C40F
+}
+
+start
+
+:Introduction to Threading;
+note right
+  Understanding the 
+  basics of concurrency
+  and parallelism
+end note
+
+:Thread Creation and Management;
+note right
+  - Creating threads
+  - Starting threads
+  - Joining threads
+  - Setting priorities
+end note
+
+:Thread Lifecycle;
+note right
+  - New
+  - Runnable
+  - Blocked
+  - Waiting
+  - Timed Waiting
+  - Terminated
+end note
+
+:Thread Synchronization;
+note right
+  - Mutex/Locks
+  - Semaphores
+  - Monitors
+  - Atomic operations
+end note
+
+:Communication Between Threads;
+note right
+  - Shared memory
+  - Message passing
+  - Condition variables
+  - Barriers
+end note
+
+:Thread Safety Patterns;
+note right
+  - Immutability
+  - Thread confinement
+  - Guarded blocks
+  - Thread-local storage
+end note
+
+:Advanced Concepts;
+fork
+  :Thread Pools;
+  note right
+    - Creating thread pools
+    - Submitting tasks
+    - Managing workers
+  end note
+fork again
+  :Futures and Promises;
+  note right
+    - Asynchronous execution
+    - Handling results
+    - Composition
+  end note
+fork again
+  :Parallel Algorithms;
+  note right
+    - Divide and conquer
+    - Map/reduce
+    - Stream processing
+  end note
+end fork
+
+:Performance Considerations;
+note right
+  - Overhead analysis
+  - Scaling tests
+  - Profiling and benchmarks
+end note
+
+:Language-Specific Implementations;
+
+fork
+  :C (pthreads);
+fork again
+  :C++ (std::thread);
+fork again
+  :Java;
+fork again
+  :C#;
+fork again
+  :Python;
+end fork
+
+:Practical Projects;
+
+stop
+
+@enduml 

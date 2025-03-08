@@ -1,0 +1,71 @@
+@startuml thread_lifecycle
+
+title Thread Lifecycle Activity Diagram
+
+skinparam backgroundColor white
+skinparam roundcorner 10
+skinparam ArrowColor #0076ce
+skinparam ActivityBackgroundColor #f0f8ff
+skinparam ActivityBorderColor #0076ce
+skinparam ActivityBorderThickness 1
+skinparam ActivityDiamondBackgroundColor #e6f2ff
+skinparam ActivityDiamondBorderColor #0076ce
+skinparam ActivityStartColor #009900
+skinparam ActivityEndColor #FF0000
+
+start
+
+:Thread Creation;
+note right: Thread object is instantiated
+
+:NEW State;
+note right: Thread is created but not yet started
+
+:Thread.start() called;
+
+:RUNNABLE State;
+note right: Thread is ready to run and waiting for CPU time
+
+partition "Thread Execution" {
+  repeat
+    if (CPU Time Available?) then (yes)
+      :RUNNING State;
+      note right: Thread is currently executing
+    else (no)
+      :Yield Control;
+    endif
+    
+    if (Thread.sleep(), wait(), blocked on I/O) then (yes)
+      :BLOCKED/WAITING State;
+      note right: Thread temporarily inactive
+      
+      if (Condition met / timeout expired / I/O completed) then (yes)
+        :Return to RUNNABLE;
+      else (interrupted)
+        :Handle Interruption;
+      endif
+    else (no)
+      :Continue Execution;
+    endif
+  repeat while (Run Method Complete?) is (no)
+}
+
+:Thread Termination;
+note right: run() method completes execution
+
+:TERMINATED State;
+note right: Thread has completed execution and cannot be restarted
+
+stop
+
+legend right
+  Thread States:
+  * NEW: Created but not started
+  * RUNNABLE: Ready to run, may be running
+  * BLOCKED: Waiting for a monitor lock
+  * WAITING: Waiting indefinitely for another thread
+  * TIMED_WAITING: Waiting for specified time
+  * TERMINATED: Completed execution
+endlegend
+
+@enduml 

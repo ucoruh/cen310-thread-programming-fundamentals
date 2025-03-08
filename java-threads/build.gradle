@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.example'
+version = '1.0-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JUnit 5 for testing
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    
+    // SLF4J API
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    
+    // Logback as the SLF4J implementation
+    implementation 'ch.qos.logback:logback-classic:1.2.11'
+}
+
+application {
+    mainClassName = 'com.example.javathreads.Main'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'com.example.javathreads.Main'
+        )
+    }
+    
+    // Include all dependencies in the JAR
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    
+    // Avoid duplicate entries
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+} 

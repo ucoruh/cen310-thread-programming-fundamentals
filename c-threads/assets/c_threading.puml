@@ -1,0 +1,267 @@
+@startuml c_threading
+
+title C POSIX Threads (pthreads) - Core Concepts
+
+skinparam backgroundcolor transparent
+skinparam {
+  BackgroundColor white
+  ClassBackgroundColor #f0f8ff
+  ClassBorderColor #0076ce
+  ClassHeaderBackgroundColor #0076ce
+  ClassHeaderFontColor white
+  NoteBackgroundColor #ffffcc
+  NoteBorderColor #999999
+}
+
+package "Thread Management" {
+  class "pthread_t" as pthread_t << (T,#lightblue) type >> {
+    Thread identifier
+  }
+  
+  class "Thread Functions" as ThreadFunctions << (F,#lightgreen) functions >> {
+    + int pthread_create(pthread_t *thread, const pthread_attr_t *attr, 
+                       void *(*start_routine)(void *), void *arg)
+    + int pthread_join(pthread_t thread, void **retval)
+    + int pthread_detach(pthread_t thread)
+    + void pthread_exit(void *retval)
+    + pthread_t pthread_self(void)
+    + int pthread_equal(pthread_t t1, pthread_t t2)
+    + int pthread_cancel(pthread_t thread)
+  }
+  
+  class "pthread_attr_t" as pthread_attr_t << (T,#lightblue) type >> {
+    Thread attributes object
+  }
+  
+  class "Thread Attribute Functions" as ThreadAttrFunctions << (F,#lightgreen) functions >> {
+    + int pthread_attr_init(pthread_attr_t *attr)
+    + int pthread_attr_destroy(pthread_attr_t *attr)
+    + int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate)
+    + int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate)
+    + int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize)
+    + int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize)
+    + int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy)
+    + int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy)
+  }
+}
+
+package "Mutex (Mutual Exclusion)" {
+  class "pthread_mutex_t" as pthread_mutex_t << (T,#lightblue) type >> {
+    Mutex object
+  }
+  
+  class "pthread_mutexattr_t" as pthread_mutexattr_t << (T,#lightblue) type >> {
+    Mutex attributes object
+  }
+  
+  class "Mutex Functions" as MutexFunctions << (F,#lightgreen) functions >> {
+    + int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
+    + int pthread_mutex_destroy(pthread_mutex_t *mutex)
+    + int pthread_mutex_lock(pthread_mutex_t *mutex)
+    + int pthread_mutex_trylock(pthread_mutex_t *mutex)
+    + int pthread_mutex_unlock(pthread_mutex_t *mutex)
+    + int pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
+  }
+  
+  class "Mutex Attribute Functions" as MutexAttrFunctions << (F,#lightgreen) functions >> {
+    + int pthread_mutexattr_init(pthread_mutexattr_t *attr)
+    + int pthread_mutexattr_destroy(pthread_mutexattr_t *attr)
+    + int pthread_mutexattr_gettype(const pthread_mutexattr_t *attr, int *type)
+    + int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type)
+    + int pthread_mutexattr_getprotocol(const pthread_mutexattr_t *attr, int *protocol)
+    + int pthread_mutexattr_setprotocol(pthread_mutexattr_t *attr, int protocol)
+  }
+  
+  class "Mutex Types" as MutexTypes << (E,#lightpink) enum >> {
+    + PTHREAD_MUTEX_NORMAL
+    + PTHREAD_MUTEX_ERRORCHECK
+    + PTHREAD_MUTEX_RECURSIVE
+    + PTHREAD_MUTEX_DEFAULT
+  }
+}
+
+package "Condition Variables" {
+  class "pthread_cond_t" as pthread_cond_t << (T,#lightblue) type >> {
+    Condition variable object
+  }
+  
+  class "pthread_condattr_t" as pthread_condattr_t << (T,#lightblue) type >> {
+    Condition variable attributes object
+  }
+  
+  class "Condition Variable Functions" as CondFunctions << (F,#lightgreen) functions >> {
+    + int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
+    + int pthread_cond_destroy(pthread_cond_t *cond)
+    + int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
+    + int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, 
+                               const struct timespec *abstime)
+    + int pthread_cond_signal(pthread_cond_t *cond)
+    + int pthread_cond_broadcast(pthread_cond_t *cond)
+  }
+  
+  class "Condition Attribute Functions" as CondAttrFunctions << (F,#lightgreen) functions >> {
+    + int pthread_condattr_init(pthread_condattr_t *attr)
+    + int pthread_condattr_destroy(pthread_condattr_t *attr)
+    + int pthread_condattr_getclock(const pthread_condattr_t *attr, clockid_t *clock_id)
+    + int pthread_condattr_setclock(pthread_condattr_t *attr, clockid_t clock_id)
+  }
+}
+
+package "Reader-Writer Locks" {
+  class "pthread_rwlock_t" as pthread_rwlock_t << (T,#lightblue) type >> {
+    Read-write lock object
+  }
+  
+  class "pthread_rwlockattr_t" as pthread_rwlockattr_t << (T,#lightblue) type >> {
+    Read-write lock attributes object
+  }
+  
+  class "Read-Write Lock Functions" as RWLockFunctions << (F,#lightgreen) functions >> {
+    + int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
+    + int pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
+    + int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
+    + int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock)
+    + int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock)
+    + int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock)
+    + int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
+    + int pthread_rwlock_timedrdlock(pthread_rwlock_t *rwlock, const struct timespec *abstime)
+    + int pthread_rwlock_timedwrlock(pthread_rwlock_t *rwlock, const struct timespec *abstime)
+  }
+}
+
+package "Barriers" {
+  class "pthread_barrier_t" as pthread_barrier_t << (T,#lightblue) type >> {
+    Barrier object
+  }
+  
+  class "pthread_barrierattr_t" as pthread_barrierattr_t << (T,#lightblue) type >> {
+    Barrier attributes object
+  }
+  
+  class "Barrier Functions" as BarrierFunctions << (F,#lightgreen) functions >> {
+    + int pthread_barrier_init(pthread_barrier_t *barrier, 
+                            const pthread_barrierattr_t *attr, unsigned count)
+    + int pthread_barrier_destroy(pthread_barrier_t *barrier)
+    + int pthread_barrier_wait(pthread_barrier_t *barrier)
+  }
+}
+
+package "Semaphores (from semaphore.h)" {
+  class "sem_t" as sem_t << (T,#lightblue) type >> {
+    Semaphore object
+  }
+  
+  class "Semaphore Functions" as SemFunctions << (F,#lightgreen) functions >> {
+    + int sem_init(sem_t *sem, int pshared, unsigned int value)
+    + int sem_destroy(sem_t *sem)
+    + int sem_wait(sem_t *sem)
+    + int sem_trywait(sem_t *sem)
+    + int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout)
+    + int sem_post(sem_t *sem)
+    + int sem_getvalue(sem_t *sem, int *sval)
+  }
+}
+
+package "Thread-Specific Data" {
+  class "pthread_key_t" as pthread_key_t << (T,#lightblue) type >> {
+    Key for thread-specific data
+  }
+  
+  class "Thread-Specific Data Functions" as TSDFunctions << (F,#lightgreen) functions >> {
+    + int pthread_key_create(pthread_key_t *key, void (*destructor)(void*))
+    + int pthread_key_delete(pthread_key_t key)
+    + int pthread_setspecific(pthread_key_t key, const void *value)
+    + void *pthread_getspecific(pthread_key_t key)
+  }
+}
+
+package "Thread Cancellation" {
+  class "Cancellation Functions" as CancelFunctions << (F,#lightgreen) functions >> {
+    + int pthread_cancel(pthread_t thread)
+    + int pthread_setcancelstate(int state, int *oldstate)
+    + int pthread_setcanceltype(int type, int *oldtype)
+    + void pthread_testcancel(void)
+  }
+  
+  class "Cancellation States" as CancelStates << (E,#lightpink) enum >> {
+    + PTHREAD_CANCEL_ENABLE
+    + PTHREAD_CANCEL_DISABLE
+  }
+  
+  class "Cancellation Types" as CancelTypes << (E,#lightpink) enum >> {
+    + PTHREAD_CANCEL_ASYNCHRONOUS
+    + PTHREAD_CANCEL_DEFERRED
+  }
+}
+
+' Relationships
+ThreadFunctions -- pthread_t : manages
+ThreadFunctions -- pthread_attr_t : uses
+ThreadAttrFunctions -- pthread_attr_t : configures
+
+MutexFunctions -- pthread_mutex_t : manages
+MutexFunctions -- pthread_mutexattr_t : uses
+MutexAttrFunctions -- pthread_mutexattr_t : configures
+MutexAttrFunctions -- MutexTypes : sets
+
+CondFunctions -- pthread_cond_t : manages
+CondFunctions -- pthread_condattr_t : uses
+CondFunctions -- pthread_mutex_t : requires
+CondAttrFunctions -- pthread_condattr_t : configures
+
+RWLockFunctions -- pthread_rwlock_t : manages
+RWLockFunctions -- pthread_rwlockattr_t : uses
+
+BarrierFunctions -- pthread_barrier_t : manages
+BarrierFunctions -- pthread_barrierattr_t : uses
+
+SemFunctions -- sem_t : manages
+
+TSDFunctions -- pthread_key_t : manages
+
+CancelFunctions -- pthread_t : affects
+CancelFunctions -- CancelStates : sets
+CancelFunctions -- CancelTypes : sets
+
+note as ThreadCreatePattern
+  Thread Creation Pattern:
+  pthread_t thread;
+  pthread_attr_t attr;
+  pthread_attr_init(&attr);
+  pthread_create(&thread, &attr, thread_function, arg);
+  pthread_attr_destroy(&attr);
+end note
+
+note as MutexPattern
+  Mutex Usage Pattern:
+  pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  pthread_mutex_lock(&mutex);
+  // Critical section
+  pthread_mutex_unlock(&mutex);
+end note
+
+note as CondPattern
+  Condition Variable Pattern:
+  pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+  
+  // Consumer thread:
+  pthread_mutex_lock(&mutex);
+  while (condition_is_false) {
+    pthread_cond_wait(&cond, &mutex);
+  }
+  // Process data
+  pthread_mutex_unlock(&mutex);
+  
+  // Producer thread:
+  pthread_mutex_lock(&mutex);
+  // Change condition
+  pthread_cond_signal(&cond);
+  pthread_mutex_unlock(&mutex);
+end note
+
+ThreadFunctions .. ThreadCreatePattern
+MutexFunctions .. MutexPattern
+CondFunctions .. CondPattern
+
+@enduml 

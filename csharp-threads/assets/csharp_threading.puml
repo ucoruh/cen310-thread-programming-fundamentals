@@ -1,0 +1,299 @@
+@startuml csharp_threading
+
+title C# Threading - Core Concepts and Classes
+
+skinparam {
+  BackgroundColor white
+  ClassBackgroundColor #f0f8ff
+  ClassBorderColor #0076ce
+  ClassHeaderBackgroundColor #0076ce
+  ClassHeaderFontColor white
+  NoteBackgroundColor #ffffcc
+  NoteBorderColor #999999
+}
+
+package "System.Threading" {
+  class Thread {
+    + Thread(ThreadStart start)
+    + Thread(ParameterizedThreadStart start)
+    --
+    + string Name { get; set; }
+    + bool IsAlive { get; }
+    + bool IsBackground { get; set; }
+    + ThreadState ThreadState { get; }
+    + ApartmentState ApartmentState { get; set; }
+    + CultureInfo CurrentCulture { get; set; }
+    + CultureInfo CurrentUICulture { get; set; }
+    + static Thread CurrentThread { get; }
+    --
+    + void Start()
+    + void Start(object parameter)
+    + void Join()
+    + bool Join(int millisecondsTimeout)
+    + void Abort()
+    + void Interrupt()
+    + static void Sleep(int millisecondsTimeout)
+    + static void SpinWait(int iterations)
+    + static bool Yield()
+  }
+  
+  enum ThreadState {
+    Running
+    StopRequested
+    SuspendRequested
+    Background
+    Unstarted
+    Stopped
+    WaitSleepJoin
+    Suspended
+    AbortRequested
+    Aborted
+  }
+  
+  class ThreadPool {
+    + static bool QueueUserWorkItem(WaitCallback callBack)
+    + static bool QueueUserWorkItem(WaitCallback callBack, object state)
+    + static void GetAvailableThreads(out int workerThreads, out int completionPortThreads)
+    + static void GetMaxThreads(out int workerThreads, out int completionPortThreads)
+    + static void SetMaxThreads(int workerThreads, int completionPortThreads)
+    + static bool UnsafeQueueUserWorkItem(WaitCallback callBack, object state)
+  }
+  
+  class Monitor {
+    + static void Enter(object obj)
+    + static void Enter(object obj, ref bool lockTaken)
+    + static void Exit(object obj)
+    + static bool TryEnter(object obj)
+    + static bool TryEnter(object obj, int millisecondsTimeout)
+    + static bool TryEnter(object obj, TimeSpan timeout, ref bool lockTaken)
+    + static bool Wait(object obj)
+    + static bool Wait(object obj, int millisecondsTimeout)
+    + static bool Wait(object obj, TimeSpan timeout)
+    + static void Pulse(object obj)
+    + static void PulseAll(object obj)
+  }
+  
+  class Interlocked {
+    + static int Increment(ref int location)
+    + static int Decrement(ref int location)
+    + static int Exchange(ref int location, int value)
+    + static int CompareExchange(ref int location, int value, int comparand)
+    + static object CompareExchange(ref object location, object value, object comparand)
+    + static T CompareExchange<T>(ref T location, T value, T comparand)
+    + static long Add(ref long location, long value)
+  }
+  
+  class AutoResetEvent {
+    + AutoResetEvent(bool initialState)
+    + bool Set()
+    + bool Reset()
+    + bool WaitOne()
+    + bool WaitOne(int millisecondsTimeout)
+    + bool WaitOne(TimeSpan timeout)
+  }
+  
+  class ManualResetEvent {
+    + ManualResetEvent(bool initialState)
+    + bool Set()
+    + bool Reset()
+    + bool WaitOne()
+    + bool WaitOne(int millisecondsTimeout)
+    + bool WaitOne(TimeSpan timeout)
+  }
+  
+  class Mutex {
+    + Mutex()
+    + Mutex(bool initiallyOwned)
+    + Mutex(bool initiallyOwned, string name)
+    + bool WaitOne()
+    + bool WaitOne(int millisecondsTimeout)
+    + bool WaitOne(TimeSpan timeout)
+    + void ReleaseMutex()
+  }
+  
+  class Semaphore {
+    + Semaphore(int initialCount, int maximumCount)
+    + Semaphore(int initialCount, int maximumCount, string name)
+    + int Release()
+    + int Release(int releaseCount)
+    + bool WaitOne()
+    + bool WaitOne(int millisecondsTimeout)
+    + bool WaitOne(TimeSpan timeout)
+  }
+  
+  class ReaderWriterLock {
+    + ReaderWriterLock()
+    + void AcquireReaderLock(int millisecondsTimeout)
+    + void AcquireWriterLock(int millisecondsTimeout)
+    + void ReleaseReaderLock()
+    + void ReleaseWriterLock()
+    + LockCookie UpgradeToWriterLock(int millisecondsTimeout)
+    + void DowngradeFromWriterLock(ref LockCookie cookie)
+  }
+  
+  class ReaderWriterLockSlim {
+    + ReaderWriterLockSlim()
+    + ReaderWriterLockSlim(LockRecursionPolicy recursionPolicy)
+    + void EnterReadLock()
+    + bool TryEnterReadLock(int millisecondsTimeout)
+    + void ExitReadLock()
+    + void EnterWriteLock()
+    + bool TryEnterWriteLock(int millisecondsTimeout)
+    + void ExitWriteLock()
+    + void EnterUpgradeableReadLock()
+    + bool TryEnterUpgradeableReadLock(int millisecondsTimeout)
+    + void ExitUpgradeableReadLock()
+  }
+}
+
+package "System.Threading.Tasks" {
+  class Task {
+    + Task(Action action)
+    + Task(Action<object> action, object state)
+    + Task(Action action, CancellationToken cancellationToken)
+    --
+    + TaskStatus Status { get; }
+    + bool IsCompleted { get; }
+    + bool IsCanceled { get; }
+    + bool IsFaulted { get; }
+    + AggregateException Exception { get; }
+    + static TaskFactory Factory { get; }
+    --
+    + void Start()
+    + void Wait()
+    + bool Wait(int millisecondsTimeout)
+    + Task ContinueWith(Action<Task> continuationAction)
+    + Task<TResult> ContinueWith<TResult>(Func<Task, TResult> continuationFunction)
+    + Task<TResult> ContinueWith<TResult>(Func<Task, TResult> continuationFunction, CancellationToken cancellationToken)
+    + static Task Delay(int millisecondsDelay)
+    + static Task<TResult> FromResult<TResult>(TResult result)
+    + static Task FromException(Exception exception)
+    + static Task WhenAll(IEnumerable<Task> tasks)
+    + static Task<TResult[]> WhenAll<TResult>(IEnumerable<Task<TResult>> tasks)
+    + static Task WhenAny(Task[] tasks)
+    + static Task<Task<TResult>> WhenAny<TResult>(Task<TResult>[] tasks)
+    + static Task Run(Action action)
+    + static Task Run(Func<Task> function)
+    + static Task<TResult> Run<TResult>(Func<TResult> function)
+    + static Task<TResult> Run<TResult>(Func<Task<TResult>> function)
+  }
+  
+  class "Task<TResult>" as TaskGeneric {
+    + Task(Func<TResult> function)
+    + Task(Func<object, TResult> function, object state)
+    --
+    + TResult Result { get; }
+    --
+    + Task<TContinuationResult> ContinueWith<TContinuationResult>(Func<Task<TResult>, TContinuationResult> continuationFunction)
+  }
+  
+  class TaskFactory {
+    + TaskFactory()
+    + TaskFactory(CancellationToken cancellationToken)
+    + TaskFactory(TaskScheduler scheduler)
+    --
+    + Task StartNew(Action action)
+    + Task<TResult> StartNew<TResult>(Func<TResult> function)
+    + Task ContinueWhenAll(Task[] tasks, Action<Task[]> continuationAction)
+    + Task<TResult> ContinueWhenAll<TResult>(Task[] tasks, Func<Task[], TResult> continuationFunction)
+    + Task ContinueWhenAny(Task[] tasks, Action<Task> continuationAction)
+    + Task<TResult> ContinueWhenAny<TResult>(Task[] tasks, Func<Task, TResult> continuationFunction)
+  }
+  
+  class TaskScheduler {
+    + static TaskScheduler Default { get; }
+    + static TaskScheduler Current { get; }
+    --
+    # abstract void QueueTask(Task task)
+    # abstract bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
+    + static TaskScheduler FromCurrentSynchronizationContext()
+  }
+  
+  class Parallel {
+    + static ParallelLoopResult For(int fromInclusive, int toExclusive, Action<int> body)
+    + static ParallelLoopResult For(int fromInclusive, int toExclusive, ParallelOptions parallelOptions, Action<int> body)
+    + static ParallelLoopResult ForEach<TSource>(IEnumerable<TSource> source, Action<TSource> body)
+    + static ParallelLoopResult ForEach<TSource>(IEnumerable<TSource> source, ParallelOptions parallelOptions, Action<TSource> body)
+    + static void Invoke(params Action[] actions)
+    + static void Invoke(ParallelOptions parallelOptions, params Action[] actions)
+  }
+}
+
+package "System.Threading.Tasks (.NET 4.5+)" {
+  class "async/await" as AsyncAwait << (K,#lightgreen) keywords >> {
+    + async Task MethodAsync() {...}
+    + async Task<TResult> MethodAsync() {...}
+    + async void MethodAsync() {...}
+    + await Task/Task<T>
+  }
+  
+  class TaskCompletionSource<TResult> {
+    + TaskCompletionSource()
+    --
+    + Task<TResult> Task { get; }
+    --
+    + void SetResult(TResult result)
+    + void SetException(Exception exception)
+    + void SetCanceled()
+    + bool TrySetResult(TResult result)
+    + bool TrySetException(Exception exception)
+    + bool TrySetCanceled()
+  }
+  
+  class ValueTask<TResult> {
+    + ValueTask(TResult result)
+    + ValueTask(Task<TResult> task)
+    --
+    + bool IsCompleted { get; }
+    + bool IsCompletedSuccessfully { get; }
+    + bool IsFaulted { get; }
+    + bool IsCanceled { get; }
+    + TResult Result { get; }
+    --
+    + Task<TResult> AsTask()
+    + ValueTask<TResult> Preserve()
+  }
+}
+
+' Relationships
+Thread "1" *-- "1" ThreadState : has state
+
+TaskGeneric --|> Task : extends
+
+Monitor -- Thread : synchronizes
+Interlocked -- Thread : atomic operations
+
+AutoResetEvent -- Thread : signals
+ManualResetEvent -- Thread : signals
+Semaphore -- Thread : coordinates
+Mutex -- Thread : exclusive access
+
+ReaderWriterLockSlim -- Thread : coordinates readers/writers
+ReaderWriterLockSlim --|> ReaderWriterLock : improved version
+
+Task -- TaskFactory : created by
+Task -- TaskScheduler : scheduled on
+Parallel -- Task : uses underneath
+AsyncAwait -- Task : works with
+TaskCompletionSource -- Task : creates/controls
+ValueTask -- Task : lightweight alternative
+
+note "Classic Threading\nSince .NET 1.0" as N1
+Thread .. N1
+
+note "Thread Synchronization\nSince .NET 1.0" as N2
+Monitor .. N2
+
+note "Task Parallel Library (TPL)\nSince .NET 4.0" as N3
+Task .. N3
+
+note "Asynchronous Programming Model\nSince .NET 4.5" as N4
+AsyncAwait .. N4
+
+note "Thread pool is automatically\nused by TPL" as N5
+ThreadPool .. N5
+
+note "Performance-oriented\ntask type (C# 7.0+)" as N6
+ValueTask .. N6
+
+@enduml 

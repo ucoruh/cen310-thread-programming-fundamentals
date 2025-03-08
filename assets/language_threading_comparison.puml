@@ -1,0 +1,197 @@
+@startuml language_threading_comparison
+
+title Threading Support Across Programming Languages
+
+skinparam {
+  BackgroundColor white
+  ArrowColor #0076ce
+  BorderColor #0076ce
+  PackageBackgroundColor #f0f8ff
+  PackageBorderColor #0076ce
+  NoteBackgroundColor #ffffcc
+  NoteBorderColor #999999
+}
+
+package "C (POSIX Threads)" as C {
+  [Thread Creation] as C_creation
+  note bottom of C_creation
+    pthread_create()
+    Low-level, explicit
+  end note
+  
+  [Thread Synchronization] as C_sync
+  note bottom of C_sync
+    pthread_mutex_*
+    pthread_cond_*
+    Manual implementation
+  end note
+  
+  [Thread Management] as C_management
+  note bottom of C_management
+    pthread_join()
+    pthread_detach()
+    Manual error handling
+  end note
+}
+
+package "C++ (std::thread)" as CPP {
+  [Thread Creation] as CPP_creation
+  note bottom of CPP_creation
+    std::thread
+    Lambda support
+    RAII principles
+  end note
+  
+  [Thread Synchronization] as CPP_sync
+  note bottom of CPP_sync
+    std::mutex
+    std::condition_variable
+    std::atomic<T>
+    lock_guard/unique_lock
+  end note
+  
+  [Thread Management] as CPP_management
+  note bottom of CPP_management
+    join()/detach()
+    Exception safety
+    Move semantics
+  end note
+  
+  [Concurrency Features] as CPP_features
+  note bottom of CPP_features
+    std::async
+    std::future/promise
+    std::shared_future
+  end note
+}
+
+package "Java" as Java {
+  [Thread Creation] as Java_creation
+  note bottom of Java_creation
+    Thread class
+    Runnable interface
+    Callable interface
+  end note
+  
+  [Thread Synchronization] as Java_sync
+  note bottom of Java_sync
+    synchronized keyword
+    Lock interface
+    wait()/notify()
+    volatile keyword
+  end note
+  
+  [Thread Management] as Java_management
+  note bottom of Java_management
+    join()/interrupt()
+    Thread states
+    Daemon threads
+  end note
+  
+  [Concurrency Utilities] as Java_utilities
+  note bottom of Java_utilities
+    java.util.concurrent
+    ExecutorService
+    ThreadPoolExecutor
+    CompletableFuture
+  end note
+}
+
+package "C#" as CSharp {
+  [Thread Creation] as CSharp_creation
+  note bottom of CSharp_creation
+    Thread class
+    ThreadPool
+    Task/Task<T>
+  end note
+  
+  [Thread Synchronization] as CSharp_sync
+  note bottom of CSharp_sync
+    lock keyword
+    Monitor class
+    Interlocked class
+    ManualResetEvent
+  end note
+  
+  [Thread Management] as CSharp_management
+  note bottom of CSharp_management
+    Join()/Abort()
+    IsBackground
+    Thread states
+  end note
+  
+  [Parallel Programming] as CSharp_parallel
+  note bottom of CSharp_parallel
+    TPL (Task Parallel Library)
+    Parallel.For/ForEach
+    async/await
+  end note
+}
+
+package "Python" as Python {
+  [Thread Creation] as Python_creation
+  note bottom of Python_creation
+    threading module
+    Thread class
+    GIL limitations
+  end note
+  
+  [Thread Synchronization] as Python_sync
+  note bottom of Python_sync
+    Lock, RLock
+    Condition
+    Semaphore
+    Event
+  end note
+  
+  [Thread Management] as Python_management
+  note bottom of Python_management
+    join()/is_alive()
+    daemon property
+    Timer threads
+  end note
+  
+  [Alternative Approaches] as Python_alt
+  note bottom of Python_alt
+    multiprocessing (bypass GIL)
+    asyncio (concurrency without threads)
+    concurrent.futures
+  end note
+}
+
+' Level of abstraction comparisons
+C_creation -[#green,dashed]-> CPP_creation : Higher abstraction
+CPP_creation -[#green,dashed]-> Java_creation : Higher abstraction
+Java_creation -[#green,dashed]-> CSharp_creation : Higher abstraction
+CSharp_creation -[#green,dashed]-> Python_creation : Higher abstraction
+
+C_sync -[#green,dashed]-> CPP_sync : Higher abstraction
+CPP_sync -[#green,dashed]-> Java_sync : Higher abstraction
+Java_sync -[#green,dashed]-> CSharp_sync : Higher abstraction
+CSharp_sync -[#green,dashed]-> Python_sync : Higher abstraction
+
+' Feature comparisons
+CPP_features -[#blue,dashed]-> Java_utilities : Similar concepts
+Java_utilities -[#blue,dashed]-> CSharp_parallel : Similar concepts
+CSharp_parallel -[#blue,dashed]-> Python_alt : Different approach
+
+note as PerformanceNote
+  **Performance Comparison**
+  C/C++ > Java/C# > Python (with GIL)
+  
+  GIL = Global Interpreter Lock (Python)
+  Restricts thread execution to one at a time
+endnote
+
+note as EaseOfUseNote
+  **Ease of Use Comparison**
+  Python > C# > Java > C++ > C
+endnote
+
+note as AsyncSupportNote
+  **Async Programming Support**
+  C# (.NET) ≥ JavaScript > Java > C++ > C
+  Python (asyncio) - Different paradigm
+endnote
+
+@enduml 

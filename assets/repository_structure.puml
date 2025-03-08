@@ -1,0 +1,121 @@
+@startwbs
+
+skinparam WBSGroupBackgroundColor white
+skinparam WBSGroupBorderColor gray
+skinparam WBSGroupFontColor black
+
+skinparam WBSArrowColor #333333
+skinparam WBSBorderColor #333333
+skinparam WBSFontColor black
+
+<style>
+wbsDiagram {
+  // Colors for different programming languages
+  .c {
+    BackgroundColor #4863A0
+    FontColor white
+    BorderColor #2A4163
+  }
+  .cpp {
+    BackgroundColor #659AD2
+    FontColor white
+    BorderColor #2A5DA0
+  }
+  .java {
+    BackgroundColor #E76F00
+    FontColor white
+    BorderColor #A34D00
+  }
+  .csharp {
+    BackgroundColor #68217A
+    FontColor white
+    BorderColor #3A1245
+  }
+  .python {
+    BackgroundColor #3572A5
+    FontColor white
+    BorderColor #1A3A5A
+  }
+  .scripts {
+    BackgroundColor #F1C40F
+    FontColor black
+    BorderColor #D4AC0D
+  }
+  .folder {
+    BackgroundColor #85B5C8
+    FontColor black
+    BorderColor #5A8CA0
+  }
+  
+  // Root node styling
+  rootNode {
+    BackgroundColor #2E4053
+    FontColor white
+    FontSize 16
+    FontStyle bold
+    BorderColor #1B2631
+    RoundCorner 10
+  }
+  
+  // File specific styling
+  .file {
+    BackgroundColor #ECF0F1
+    FontColor #34495E
+    BorderColor #BDC3C7
+    FontStyle italic
+  }
+}
+</style>
+
+* Thread Programming Fundamentals
+** c-threads <<c>>
+*** src
+*** build
+*** CMakeLists.txt <<file>>
+*** README.md <<file>>
+*** build.bat <<file>>
+*** run.bat <<file>>
+*** clean.bat <<file>>
+** cpp-threads <<cpp>>
+*** src
+*** build
+*** CMakeLists.txt <<file>>
+*** README.md <<file>>
+*** build.bat <<file>>
+*** run.bat <<file>>
+*** clean.bat <<file>>
+** java-threads <<java>>
+*** src
+**** main
+***** java
+****** com.example.javathreads
+***** resources
+**** test
+*** scripts <<scripts>>
+*** pom.xml <<file>>
+*** README.md <<file>>
+** csharp-threads <<csharp>>
+*** src
+*** README.md <<file>>
+*** build.bat <<file>>
+*** run.bat <<file>>
+*** clean.bat <<file>>
+** python-threads <<python>>
+*** threading_examples
+*** multiprocessing_examples
+*** asyncio_examples
+*** comparison
+*** utilities
+*** exercises
+*** scripts <<scripts>>
+*** README.md <<file>>
+*** requirements.txt <<file>>
+*** setup.py <<file>>
+*** main.py <<file>>
+** git-scripts <<scripts>>
+*** download_plantuml.bat <<file>>
+*** download_plantuml.sh <<file>>
+** .vscode <<folder>>
+** README.md <<file>>
+** .gitignore <<file>>
+@endwbs

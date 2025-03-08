@@ -1,0 +1,138 @@
+@startuml synchronization_mechanisms
+
+
+title Thread Synchronization Mechanisms Comparison
+
+skinparam {
+  BackgroundColor white
+  ArrowColor #0076ce
+  BorderColor #0076ce
+  ComponentBackgroundColor #f0f8ff
+  ComponentBorderColor #0076ce
+  NoteBackgroundColor #ffffcc
+  NoteBorderColor #999999
+}
+
+package "Basic Locks" {
+  component [Mutex/Lock] as mutex
+  note right of mutex
+    - Exclusive access
+    - Only one thread at a time
+    - Blocking operation
+    - Implementation: pthread_mutex, 
+      std::mutex, synchronized
+  end note
+  
+  component [Semaphore] as semaphore
+  note right of semaphore
+    - Counts available resources
+    - Multiple threads may access
+    - Blocking operation
+    - Implementation: sem_t, 
+      std::counting_semaphore
+  end note
+  
+  component [Binary Semaphore] as binarySemaphore
+  note right of binarySemaphore
+    - Special case of semaphore
+    - Similar to mutex but different ownership
+    - Can be signaled from any thread
+    - Implementation: semaphore with count=1
+  end note
+}
+
+package "Advanced Mechanisms" {
+  component [Reader-Writer Lock] as rwLock
+  note right of rwLock
+    - Multiple readers OR one writer
+    - Optimization for read-heavy workloads
+    - Implementation: pthread_rwlock, 
+      std::shared_mutex
+  end note
+  
+  component [Condition Variable] as condVar
+  note right of condVar
+    - Thread signaling mechanism
+    - Wait for specific condition
+    - Used with mutex
+    - Implementation: pthread_cond, 
+      std::condition_variable
+  end note
+  
+  component [Monitor] as monitor
+  note right of monitor
+    - High-level abstraction
+    - Mutex + condition variable
+    - Common in Java and C#
+    - Implementation: synchronized methods, lock
+  end note
+}
+
+package "Non-blocking Synchronization" {
+  component [Atomic Operations] as atomic
+  note right of atomic
+    - Hardware-supported operations
+    - No locks needed
+    - Limited to simple operations
+    - Implementation: std::atomic, 
+      AtomicInteger, Interlocked
+  end note
+  
+  component [Compare-And-Swap (CAS)] as cas
+  note right of cas
+    - Foundation of lock-free algorithms
+    - Updates value only if unchanged
+    - Implementation: atomic operations
+  end note
+  
+  component [Read-Copy-Update (RCU)] as rcu
+  note right of rcu
+    - Optimized for read-heavy workloads
+    - Writers create new version
+    - Readers see consistent data
+    - Implementation: Linux kernel, 
+      advanced libraries
+  end note
+}
+
+mutex --> semaphore : More general
+semaphore --> binarySemaphore : Special case
+mutex --> rwLock : Read optimization
+mutex --> condVar : Used together
+condVar --> monitor : Combined in
+atomic --> cas : Implements
+cas --> rcu : Used in implementation
+
+note "Performance Impact\n(Least to Most Overhead)" as PerfNote
+note "Race Condition Protection\n(Strongest to Weakest)" as ProtectionNote
+note "Implementation Complexity\n(Simplest to Most Complex)" as ComplexityNote
+
+PerfNote .. atomic
+atomic .. cas
+cas .. rcu
+rcu .. mutex
+mutex .. semaphore
+semaphore .. rwLock
+rwLock .. condVar
+condVar .. monitor
+
+ProtectionNote .. monitor
+monitor .. mutex
+mutex .. rwLock
+rwLock .. semaphore
+semaphore .. condVar
+condVar .. cas
+cas .. atomic
+atomic .. rcu
+
+ComplexityNote .. mutex
+mutex .. semaphore
+semaphore .. binarySemaphore
+binarySemaphore .. rwLock
+rwLock .. condVar
+condVar .. monitor
+monitor .. atomic
+atomic .. cas
+cas .. rcu
+
+@enduml 

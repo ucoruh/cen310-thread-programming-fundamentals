@@ -1,0 +1,124 @@
+@startuml thread_communication
+
+title Thread Communication Patterns - Sequence Diagram
+
+skinparam backgroundcolor transparent
+skinparam {
+  SequenceArrowColor #0076ce
+  SequenceLifeLineBorderColor #0076ce
+  SequenceLifeLineBackgroundColor #f0f8ff
+  ParticipantBorderColor #0076ce
+  ParticipantBackgroundColor #f0f8ff
+  ParticipantFontStyle bold
+  NoteBackgroundColor #ffffcc
+  NoteBorderColor #999999
+}
+
+participant "Main Thread" as Main
+participant "Worker Thread 1" as Worker1
+participant "Worker Thread 2" as Worker2
+participant "Shared Resource" as Resource
+participant "Condition Variable" as Condition
+participant "Message Queue" as Queue
+
+== Thread Creation & Join Pattern ==
+
+Main -> Worker1 ++ : create()
+note right: Thread object instantiated
+Main -> Worker1 : start()
+note right: Thread begins execution
+
+Main -> Worker2 ++ : create()
+Main -> Worker2 : start()
+
+Main -> Worker1 : join()
+note right: Main thread waits for\nWorker1 to complete
+Worker1 --> Main -- : return
+note right: Worker1 has completed
+
+Main -> Worker2 : join()
+Worker2 --> Main -- : return
+
+== Mutex-based Synchronization ==
+
+Worker1 -> Resource ++ : lock()
+note right: Acquire exclusive access
+Worker1 -> Resource : modify()
+note right: Critical section
+Worker1 -> Resource -- : unlock()
+note right: Release lock
+
+Worker2 -> Resource ++ : lock()
+Worker2 -> Resource : modify()
+Worker2 -> Resource -- : unlock()
+
+== Condition Variable Pattern ==
+
+Worker1 -> Resource ++ : lock()
+Worker1 -> Condition ++ : wait()
+note right: Worker1 releases lock\nand waits for condition
+note over Resource: lock released
+Resource --
+
+Worker2 -> Resource ++ : lock()
+Worker2 -> Resource : modify()
+Worker2 -> Condition : signal()
+note right: Signal that condition is met
+Worker2 -> Resource -- : unlock()
+
+Condition -> Worker1 -- : notify
+note right: Worker1 woken up
+Worker1 -> Resource ++ : lock reacquired
+Worker1 -> Resource : continue processing
+Worker1 -> Resource -- : unlock()
+
+== Producer-Consumer Pattern ==
+
+Worker1 -> Resource ++ : lock()
+Worker1 -> Queue ++ : push(data)
+note right: Add item to queue
+Worker1 -> Condition : signal()
+note right: Notify consumers
+Worker1 -> Resource -- : unlock()
+
+Worker2 -> Resource ++ : lock()
+loop while queue is empty
+  Worker2 -> Condition ++ : wait()
+  note over Resource: lock released
+  Resource --
+  Condition -> Worker2 -- : notify
+  Worker2 -> Resource ++ : lock reacquired
+end
+Worker2 -> Queue -- : pop()
+note right: Retrieve item from queue
+Worker2 -> Resource -- : unlock()
+
+== Reader-Writer Pattern ==
+
+Worker1 -> Resource ++ : readLock()
+note right: Multiple readers allowed
+Worker1 -> Resource : read()
+Worker1 -> Resource -- : unlockRead()
+
+Worker2 -> Resource ++ : readLock()
+Worker2 -> Resource : read()
+Worker2 -> Resource -- : unlockRead()
+
+Worker1 -> Resource ++ : writeLock()
+note right: Exclusive write access
+Worker1 -> Resource : write()
+Worker1 -> Resource -- : unlockWrite()
+
+== Future/Promise Pattern ==
+
+Main -> Worker1 ++ : submitTask(callable)
+create "Future" as Future
+Main -> Future ++ : createFuture()
+Worker1 -> Future : setPromise(result)
+note right: Task completes and\nsets the result
+Worker1 --
+Main -> Future : get()
+note right: Blocks until result available
+Future --> Main -- : return result
+
+@enduml 

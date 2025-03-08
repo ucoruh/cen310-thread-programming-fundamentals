@@ -1,0 +1,213 @@
+@startuml java_threading
+
+title Java Threading - Core Concepts and Classes
+
+skinparam backgroundcolor transparent
+skinparam {
+  BackgroundColor white
+  ClassBackgroundColor #f0f8ff
+  ClassBorderColor #0076ce
+  ClassHeaderBackgroundColor #0076ce
+  ClassHeaderFontColor white
+  NoteBackgroundColor #ffffcc
+  NoteBorderColor #999999
+}
+
+package "java.lang" {
+  class Thread {
+    - ThreadGroup group
+    - Runnable target
+    - String name
+    - int priority
+    - boolean daemon
+    - long threadId
+    --
+    + Thread()
+    + Thread(Runnable target)
+    + Thread(String name)
+    + Thread(Runnable target, String name)
+    + void start()
+    + void run()
+    + void interrupt()
+    + boolean isInterrupted()
+    + void join()
+    + void join(long millis)
+    + static Thread currentThread()
+    + static void sleep(long millis)
+    + static void yield()
+  }
+  
+  enum "Thread$State" as ThreadState {
+    NEW
+    RUNNABLE
+    BLOCKED
+    WAITING
+    TIMED_WAITING
+    TERMINATED
+  }
+  
+  Thread +-- ThreadState
+  
+  interface Runnable {
+    + void run()
+  }
+  
+  class ThreadGroup {
+    - ThreadGroup parent
+    - String name
+    --
+    + int activeCount()
+    + int enumerate(Thread[] list)
+    + void interrupt()
+  }
+  
+  class Object {
+    + void wait()
+    + void wait(long timeout)
+    + void notify()
+    + void notifyAll()
+  }
+}
+
+package "java.util.concurrent" {
+  interface Executor {
+    + void execute(Runnable command)
+  }
+  
+  interface ExecutorService {
+    + Future<?> submit(Runnable task)
+    + <T> Future<T> submit(Callable<T> task)
+    + void shutdown()
+    + List<Runnable> shutdownNow()
+  }
+  
+  interface Callable<V> {
+    + V call() throws Exception
+  }
+  
+  interface Future<V> {
+    + boolean cancel(boolean mayInterruptIfRunning)
+    + boolean isCancelled()
+    + boolean isDone()
+    + V get()
+    + V get(long timeout, TimeUnit unit)
+  }
+  
+  class ThreadPoolExecutor {
+    - BlockingQueue<Runnable> workQueue
+    - int corePoolSize
+    - int maximumPoolSize
+    - long keepAliveTime
+    --
+    + void execute(Runnable command)
+    + void shutdown()
+  }
+  
+  class Executors {
+    + {static} ExecutorService newSingleThreadExecutor()
+    + {static} ExecutorService newFixedThreadPool(int nThreads)
+    + {static} ExecutorService newCachedThreadPool()
+    + {static} ScheduledExecutorService newScheduledThreadPool(int corePoolSize)
+  }
+  
+  class CompletableFuture<T> {
+    + static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier)
+    + <U> CompletableFuture<U> thenApply(Function<? super T,? extends U> fn)
+    + CompletableFuture<Void> thenAccept(Consumer<? super T> action)
+    + static CompletableFuture<Void> allOf(CompletableFuture<?>... cfs)
+    + T get()
+  }
+}
+
+package "java.util.concurrent.locks" {
+  interface Lock {
+    + void lock()
+    + boolean tryLock()
+    + void unlock()
+    + Condition newCondition()
+  }
+  
+  class ReentrantLock {
+    - boolean fair
+    --
+    + ReentrantLock()
+    + ReentrantLock(boolean fair)
+    + void lock()
+    + void unlock()
+    + boolean isHeldByCurrentThread()
+  }
+  
+  interface ReadWriteLock {
+    + Lock readLock()
+    + Lock writeLock()
+  }
+  
+  class ReentrantReadWriteLock {
+    + ReentrantReadWriteLock()
+    + ReentrantReadWriteLock(boolean fair)
+    + Lock readLock()
+    + Lock writeLock()
+  }
+  
+  interface Condition {
+    + void await()
+    + boolean await(long time, TimeUnit unit)
+    + void signal()
+    + void signalAll()
+  }
+}
+
+package "java.util.concurrent.atomic" {
+  class AtomicInteger {
+    + AtomicInteger(int initialValue)
+    + int get()
+    + void set(int newValue)
+    + int getAndSet(int newValue)
+    + boolean compareAndSet(int expect, int update)
+    + int getAndIncrement()
+    + int incrementAndGet()
+  }
+  
+  class AtomicLong
+  class AtomicBoolean
+  class AtomicReference<V>
+}
+
+' Relationships
+Thread "1" *-- "0..1" Runnable : runs
+Thread "0..*" o-- "0..1" ThreadGroup : belongs to
+
+Runnable <|.. Thread : implements
+
+ExecutorService --|> Executor : extends
+ThreadPoolExecutor ..|> ExecutorService : implements
+
+Executors -- ThreadPoolExecutor : creates
+
+Future <|-- CompletableFuture : extends
+
+Callable -- Future : creates
+
+Lock <|.. ReentrantLock : implements
+ReadWriteLock <|.. ReentrantReadWriteLock : implements
+Lock "1" -- "0..*" Condition : creates
+
+note "Low-level threading\nsince Java 1.0" as N1
+Thread .. N1
+
+note "Concurrent utilities\nsince Java 5.0" as N2
+ExecutorService .. N2
+
+note "Enhanced concurrency APIs\nsince Java 8" as N3
+CompletableFuture .. N3
+
+note "Thread synchronization\nvia intrinsic locks" as N4
+Object .. N4
+
+note "Explicit lock mechanisms\nsince Java 5.0" as N5
+ReentrantLock .. N5
+
+note "Non-blocking operations\nsince Java 5.0" as N6
+AtomicInteger .. N6
+
+@enduml 

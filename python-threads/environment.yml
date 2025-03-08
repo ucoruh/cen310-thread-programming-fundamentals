@@ -1,0 +1,20 @@
+name: python-threading
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - numpy
+  - pandas
+  - matplotlib
+  - requests
+  - aiohttp
+  - asyncio
+  - pip:
+    - pytest
+    - black
+    - flake8
+    - mypy
+    - tqdm
+    - beautifulsoup4 

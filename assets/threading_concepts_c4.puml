@@ -1,0 +1,75 @@
+@startuml threading_concepts_c4
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title "Thread Programming Fundamentals - Conceptual C4 Model"
+
+Person(developer, "Developer", "Software developer learning threading concepts")
+
+System_Boundary(threadProgramming, "Thread Programming Fundamentals") {
+    Container(threadCreation, "Thread Creation", "Basic thread creation and management", "Core concept")
+    Container(threadSync, "Thread Synchronization", "Protecting shared resources", "Core concept")
+    Container(threadComm, "Thread Communication", "Inter-thread messaging and coordination", "Core concept")
+    Container(threadPatterns, "Thread Safety Patterns", "Common patterns for safe concurrent code", "Advanced concept")
+    Container(threadPooling, "Thread Pooling", "Managing groups of worker threads", "Advanced concept")
+    Container(asyncProgramming, "Asynchronous Programming", "Non-blocking execution models", "Advanced concept")
+    
+    Container_Boundary(languageImplementations, "Language Implementations") {
+        Container(cThreads, "C (POSIX Threads)", "Low-level threading library", "pthreads")
+        Container(cppThreads, "C++ (std::thread)", "Modern C++ threading", "C++11 and newer")
+        Container(javaThreads, "Java Threads", "Java threading and concurrent utilities", "Thread and java.util.concurrent")
+        Container(csharpThreads, "C# Threads", "C# threading and TPL", ".NET Threading")
+        Container(pythonThreads, "Python Threads", "Python concurrency approaches", "threading, multiprocessing, asyncio")
+    }
+}
+
+Rel(developer, threadCreation, "Learns")
+Rel(developer, threadSync, "Learns")
+Rel(developer, threadComm, "Learns")
+Rel(developer, threadPatterns, "Learns")
+Rel(developer, threadPooling, "Learns")
+Rel(developer, asyncProgramming, "Learns")
+
+Rel(threadCreation, threadSync, "Builds upon")
+Rel(threadSync, threadComm, "Enables")
+Rel(threadComm, threadPatterns, "Implements using")
+Rel(threadSync, threadPatterns, "Implements using")
+Rel(threadCreation, threadPooling, "Optimizes with")
+Rel(threadCreation, asyncProgramming, "Alternative to")
+
+Rel(threadCreation, cThreads, "Implemented in")
+Rel(threadCreation, cppThreads, "Implemented in")
+Rel(threadCreation, javaThreads, "Implemented in")
+Rel(threadCreation, csharpThreads, "Implemented in")
+Rel(threadCreation, pythonThreads, "Implemented in")
+
+Rel(threadSync, cThreads, "Implemented in")
+Rel(threadSync, cppThreads, "Implemented in")
+Rel(threadSync, javaThreads, "Implemented in")
+Rel(threadSync, csharpThreads, "Implemented in")
+Rel(threadSync, pythonThreads, "Implemented in")
+
+Rel(threadComm, cThreads, "Implemented in")
+Rel(threadComm, cppThreads, "Implemented in")
+Rel(threadComm, javaThreads, "Implemented in")
+Rel(threadComm, csharpThreads, "Implemented in")
+Rel(threadComm, pythonThreads, "Implemented in")
+
+Rel(threadPatterns, cThreads, "Implemented in")
+Rel(threadPatterns, cppThreads, "Implemented in")
+Rel(threadPatterns, javaThreads, "Implemented in")
+Rel(threadPatterns, csharpThreads, "Implemented in")
+Rel(threadPatterns, pythonThreads, "Implemented in")
+
+Rel(threadPooling, cThreads, "Implemented in")
+Rel(threadPooling, cppThreads, "Implemented in")
+Rel(threadPooling, javaThreads, "Implemented in")
+Rel(threadPooling, csharpThreads, "Implemented in")
+Rel(threadPooling, pythonThreads, "Implemented in")
+
+Rel(asyncProgramming, cThreads, "Limited in")
+Rel(asyncProgramming, cppThreads, "Implemented in")
+Rel(asyncProgramming, javaThreads, "Implemented in")
+Rel(asyncProgramming, csharpThreads, "Implemented in")
+Rel(asyncProgramming, pythonThreads, "Implemented in")
+
+@enduml 

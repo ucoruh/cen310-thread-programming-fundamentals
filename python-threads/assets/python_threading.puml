@@ -1,0 +1,389 @@
+@startuml python_threading
+
+title Python Concurrency Models - threading, multiprocessing, and asyncio
+
+skinparam {
+  BackgroundColor white
+  ClassBackgroundColor #f0f8ff
+  ClassBorderColor #0076ce
+  ClassHeaderBackgroundColor #0076ce
+  ClassHeaderFontColor white
+  NoteBackgroundColor #ffffcc
+  NoteBorderColor #999999
+}
+
+package "threading" {
+  class Thread {
+    + __init__(group=None, target=None, name=None, args=(), kwargs={}, *, daemon=None)
+    + start()
+    + run()
+    + join(timeout=None)
+    + is_alive()
+    + isDaemon()
+    + setDaemon(daemonic)
+    + getName()
+    + setName(name)
+    --
+    + name: str
+    + daemon: bool
+    + ident: int
+    ..
+    + {static} current_thread()
+    + {static} active_count()
+    + {static} enumerate()
+    + {static} main_thread()
+  }
+  
+  class Timer {
+    + __init__(interval, function, args=None, kwargs=None)
+    + cancel()
+  }
+  
+  class "threading module functions" as threading_funcs << (F,#lightgreen) functions >> {
+    + current_thread()
+    + active_count()
+    + enumerate()
+    + main_thread()
+    + settrace(func)
+    + setprofile(func)
+    + stack_size([size])
+    + get_ident()
+    + get_native_id()
+  }
+  
+  class Lock {
+    + acquire(blocking=True, timeout=-1)
+    + release()
+    + locked()
+    + __enter__()
+    + __exit__(exc_type, exc_val, exc_tb)
+  }
+  
+  class RLock {
+    + acquire(blocking=True, timeout=-1)
+    + release()
+    + __enter__()
+    + __exit__(exc_type, exc_val, exc_tb)
+  }
+  
+  class Condition {
+    + __init__(lock=None)
+    + acquire(*args)
+    + release()
+    + wait(timeout=None)
+    + wait_for(predicate, timeout=None)
+    + notify(n=1)
+    + notify_all()
+    + __enter__()
+    + __exit__(exc_type, exc_val, exc_tb)
+  }
+  
+  class Semaphore {
+    + __init__(value=1)
+    + acquire(blocking=True, timeout=None)
+    + release(n=1)
+    + __enter__()
+    + __exit__(exc_type, exc_val, exc_tb)
+  }
+  
+  class BoundedSemaphore {
+    + __init__(value=1)
+  }
+  
+  class Event {
+    + __init__()
+    + is_set()
+    + set()
+    + clear()
+    + wait(timeout=None)
+  }
+  
+  class Barrier {
+    + __init__(parties, action=None, timeout=None)
+    + wait(timeout=None)
+    + reset()
+    + abort()
+    + parties
+    + n_waiting
+    + broken
+  }
+  
+  class ThreadPoolExecutor << (E, #lightgreen) from concurrent.futures >> {
+    + __init__(max_workers=None, thread_name_prefix='', initializer=None, initargs=())
+    + submit(fn, *args, **kwargs)
+    + map(fn, *iterables, timeout=None, chunksize=1)
+    + shutdown(wait=True, cancel_futures=False)
+  }
+}
+
+package "multiprocessing" {
+  class Process {
+    + __init__(group=None, target=None, name=None, args=(), kwargs={}, *, daemon=None)
+    + start()
+    + run()
+    + join(timeout=None)
+    + is_alive()
+    + terminate()
+    + kill()
+    + close()
+    --
+    + name: str
+    + daemon: bool
+    + pid: int
+    + exitcode: int
+    ..
+    + {static} current_process()
+    + {static} active_children()
+  }
+  
+  class Pool {
+    + __init__(processes=None, initializer=None, initargs=(), maxtasksperchild=None)
+    + apply(func, args=(), kwds={})
+    + apply_async(func, args=(), kwds={}, callback=None, error_callback=None)
+    + map(func, iterable, chunksize=None)
+    + map_async(func, iterable, chunksize=None, callback=None, error_callback=None)
+    + imap(func, iterable, chunksize=1)
+    + imap_unordered(func, iterable, chunksize=1)
+    + starmap(func, iterable, chunksize=None)
+    + starmap_async(func, iterable, chunksize=None, callback=None, error_callback=None)
+    + close()
+    + terminate()
+    + join()
+  }
+  
+  class Queue {
+    + __init__(maxsize=0)
+    + qsize()
+    + empty()
+    + full()
+    + put(obj, block=True, timeout=None)
+    + put_nowait(obj)
+    + get(block=True, timeout=None)
+    + get_nowait()
+    + close()
+    + join_thread()
+    + cancel_join_thread()
+  }
+  
+  class Pipe {
+    + {static} Pipe(duplex=True)
+  }
+  
+  class Manager {
+    + __init__()
+    + start()
+    + shutdown()
+    + register(typeid, callable)
+    + {callables} 
+    + dict()
+    + list()
+    + namespace()
+    + Lock()
+    + RLock()
+    + Condition()
+    + Semaphore()
+    + BoundedSemaphore()
+    + Event()
+    + Barrier()
+    + Queue()
+    + Value()
+    + Array()
+  }
+  
+  class Value {
+    + __init__(typecode_or_type, *args, lock=True)
+    + get()
+    + set()
+    + value
+  }
+  
+  class Array {
+    + __init__(typecode_or_type, size_or_initializer, *, lock=True)
+    + value
+  }
+  
+  class ProcessPoolExecutor << (E, #lightgreen) from concurrent.futures >> {
+    + __init__(max_workers=None, mp_context=None, initializer=None, initargs=())
+    + submit(fn, *args, **kwargs)
+    + map(fn, *iterables, timeout=None, chunksize=1)
+    + shutdown(wait=True, cancel_futures=False)
+  }
+}
+
+package "asyncio" {
+  class "coroutine" as coroutine << (D, #lightpink) decorator >> {
+    {Marks a function as a coroutine}
+  }
+  
+  class "async/await" as async_await << (K, #lightgreen) keywords >> {
+    + async def func(): ...
+    + await coroutine_or_future
+  }
+  
+  class Task {
+    + {static} create_task(coro, *, name=None)
+    + {static} current_task(loop=None)
+    + {static} all_tasks(loop=None)
+    + cancel()
+    + cancelled()
+    + done()
+    + result()
+    + exception()
+    + add_done_callback(callback, *, context=None)
+    + remove_done_callback(callback)
+    + get_stack()
+    + print_stack()
+    + get_coro()
+    + get_name()
+    + set_name(name)
+  }
+  
+  class Future {
+    + cancel()
+    + cancelled()
+    + done()
+    + result()
+    + exception()
+    + add_done_callback(callback, *, context=None)
+    + remove_done_callback(callback)
+    + set_result(result)
+    + set_exception(exception)
+  }
+  
+  class "asyncio module functions" as asyncio_funcs << (F, #lightgreen) functions >> {
+    + run(coro, *, debug=False)
+    + create_task(coro, *, name=None)
+    + current_task(loop=None)
+    + gather(*aws, return_exceptions=False)
+    + shield(aw)
+    + wait_for(aw, timeout, *, loop=None)
+    + wait(aws, *, timeout=None, return_when=ALL_COMPLETED)
+    + sleep(delay, result=None, *, loop=None)
+    + ensure_future(coro_or_future, *, loop=None)
+  }
+  
+  class Event {
+    + __init__(*, loop=None)
+    + is_set()
+    + set()
+    + clear()
+    + wait()
+  }
+  
+  class Lock {
+    + __init__(*, loop=None)
+    + locked()
+    + acquire()
+    + release()
+    + __aenter__()
+    + __aexit__(exc_type, exc, tb)
+  }
+  
+  class Semaphore {
+    + __init__(value=1, *, loop=None)
+    + locked()
+    + acquire()
+    + release()
+    + __aenter__()
+    + __aexit__(exc_type, exc, tb)
+  }
+  
+  class BoundedSemaphore {
+    + __init__(value=1, *, loop=None)
+  }
+  
+  class Condition {
+    + __init__(lock=None, *, loop=None)
+    + locked()
+    + acquire()
+    + release()
+    + wait()
+    + wait_for(predicate)
+    + notify(n=1)
+    + notify_all()
+    + __aenter__()
+    + __aexit__(exc_type, exc, tb)
+  }
+  
+  class Queue {
+    + __init__(maxsize=0, *, loop=None)
+    + qsize()
+    + empty()
+    + full()
+    + put(item)
+    + put_nowait(item)
+    + get()
+    + get_nowait()
+    + join()
+    + task_done()
+  }
+}
+
+' Relationships
+Thread --|> Timer : extends
+
+Lock -- Thread : synchronizes
+RLock -- Thread : synchronizes
+Condition -- Thread : coordinates
+Condition "1" o-- "1" Lock : contains
+Semaphore -- Thread : coordinates
+BoundedSemaphore --|> Semaphore : extends
+Event -- Thread : signals
+Barrier -- Thread : synchronizes
+ThreadPoolExecutor -- Thread : manages
+
+Process -- Manager : can use
+Manager "1" o-- "*" Value : creates
+Manager "1" o-- "*" Array : creates
+Manager "1" o-- "*" Queue : creates
+Manager "1" o-- "*" Lock : creates
+Manager "1" o-- "*" RLock : creates
+Manager "1" o-- "*" Condition : creates
+Manager "1" o-- "*" Semaphore : creates
+Manager "1" o-- "*" BoundedSemaphore : creates
+Manager "1" o-- "*" Event : creates
+Manager "1" o-- "*" Barrier : creates
+ProcessPoolExecutor -- Process : manages
+
+coroutine -- Task : converted to
+coroutine -- async_await : used with
+Task --|> Future : extends
+asyncio_funcs -- Task : creates/manages
+asyncio_funcs -- Future : creates/manages
+asyncio::Event -- Task : coordinates
+asyncio::Lock -- Task : synchronizes
+asyncio::Semaphore -- Task : coordinates
+asyncio::BoundedSemaphore --|> asyncio::Semaphore : extends
+asyncio::Condition -- Task : coordinates
+asyncio::Condition "1" o-- "1" asyncio::Lock : contains
+asyncio::Queue -- Task : communicates
+
+note "GIL Limited" as N1
+note "Multi-Core Capable" as N2
+note "Single-Threaded Event Loop" as N3
+
+Thread .. N1
+Process .. N2
+coroutine .. N3
+
+note bottom of Thread
+  Subject to the Global Interpreter Lock (GIL)
+  Good for I/O-bound tasks
+  Limited for CPU-bound workloads
+endnote
+
+note bottom of Process
+  Bypasses the GIL limitation
+  Uses separate memory space 
+  Good for CPU-bound tasks
+  Higher overhead than threads
+endnote
+
+note bottom of coroutine
+  Non-blocking asynchronous code
+  Cooperative multitasking
+  Excellent for I/O-bound, high-concurrency
+  Not suitable for CPU-bound tasks
+endnote
+
+@enduml 

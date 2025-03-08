@@ -1,0 +1,349 @@
+@startuml cpp_threading
+
+title C++ Threading - Core Concepts and Classes (C++11 and newer)
+
+skinparam {
+  BackgroundColor white
+  ClassBackgroundColor #f0f8ff
+  ClassBorderColor #0076ce
+  ClassHeaderBackgroundColor #0076ce
+  ClassHeaderFontColor white
+  NoteBackgroundColor #ffffcc
+  NoteBorderColor #999999
+}
+
+package "std::thread (C++11)" {
+  class thread {
+    + thread()
+    + thread(Callable&& f, Args&&... args)
+    + thread(thread&& other)
+    + ~thread()
+    --
+    + thread& operator=(thread&& other)
+    + bool joinable() const
+    + void join()
+    + void detach()
+    + id get_id() const
+    + native_handle_type native_handle()
+    --
+    + {static} unsigned hardware_concurrency()
+  }
+  
+  class "thread::id" as thread_id {
+    + id()
+    --
+    + bool operator==(const id& other) const
+    + bool operator!=(const id& other) const
+    + bool operator<(const id& other) const
+  }
+  
+  class this_thread << (N,#white) namespace >> {
+    + {static} thread::id get_id()
+    + {static} void yield()
+    + {static} void sleep_for(duration)
+    + {static} void sleep_until(time_point)
+  }
+}
+
+package "std::mutex (C++11)" {
+  class mutex {
+    + mutex()
+    + ~mutex()
+    --
+    + void lock()
+    + bool try_lock()
+    + void unlock()
+  }
+  
+  class recursive_mutex {
+    + recursive_mutex()
+    + ~recursive_mutex()
+    --
+    + void lock()
+    + bool try_lock()
+    + void unlock()
+  }
+  
+  class timed_mutex {
+    + timed_mutex()
+    + ~timed_mutex()
+    --
+    + void lock()
+    + bool try_lock()
+    + void unlock()
+    + bool try_lock_for(duration)
+    + bool try_lock_until(time_point)
+  }
+  
+  class recursive_timed_mutex {
+    + recursive_timed_mutex()
+    + ~recursive_timed_mutex()
+    --
+    + void lock()
+    + bool try_lock()
+    + void unlock()
+    + bool try_lock_for(duration)
+    + bool try_lock_until(time_point)
+  }
+  
+  class shared_mutex << (T,#lightblue) C++17 >> {
+    + shared_mutex()
+    + ~shared_mutex()
+    --
+    + void lock()
+    + bool try_lock()
+    + void unlock()
+    + void lock_shared()
+    + bool try_lock_shared()
+    + void unlock_shared()
+  }
+  
+  class shared_timed_mutex << (T,#lightblue) C++14 >> {
+    + shared_timed_mutex()
+    + ~shared_timed_mutex()
+    --
+    + void lock()
+    + bool try_lock()
+    + void unlock()
+    + void lock_shared()
+    + bool try_lock_shared()
+    + void unlock_shared()
+    + bool try_lock_for(duration)
+    + bool try_lock_until(time_point)
+  }
+}
+
+package "Mutex Wrappers (C++11)" {
+  class lock_guard<Mutex> {
+    + lock_guard(Mutex& m)
+    + lock_guard(Mutex& m, adopt_lock_t)
+    + ~lock_guard()
+  }
+  
+  class unique_lock<Mutex> {
+    + unique_lock()
+    + unique_lock(Mutex& m)
+    + unique_lock(Mutex& m, defer_lock_t)
+    + unique_lock(Mutex& m, try_to_lock_t)
+    + unique_lock(Mutex& m, adopt_lock_t)
+    + ~unique_lock()
+    --
+    + void lock()
+    + bool try_lock()
+    + void unlock()
+    + bool owns_lock() const
+    + Mutex* release()
+    + Mutex* mutex() const
+  }
+  
+  class shared_lock<Mutex> << (T,#lightblue) C++14 >> {
+    + shared_lock()
+    + shared_lock(Mutex& m)
+    + shared_lock(Mutex& m, defer_lock_t)
+    + shared_lock(Mutex& m, try_to_lock_t)
+    + shared_lock(Mutex& m, adopt_lock_t)
+    + ~shared_lock()
+    --
+    + void lock()
+    + bool try_lock()
+    + void unlock()
+    + bool owns_lock() const
+    + Mutex* release()
+    + Mutex* mutex() const
+  }
+  
+  class scoped_lock<Mutexes...> << (T,#lightblue) C++17 >> {
+    + scoped_lock(Mutexes&... mutexes)
+    + ~scoped_lock()
+  }
+}
+
+package "std::condition_variable (C++11)" {
+  class condition_variable {
+    + condition_variable()
+    + ~condition_variable()
+    --
+    + void notify_one()
+    + void notify_all()
+    + void wait(unique_lock<mutex>& lock)
+    + template<Predicate> void wait(unique_lock<mutex>& lock, Predicate pred)
+    + template<Clock, Duration> cv_status wait_until(...)
+    + template<Clock, Duration, Predicate> bool wait_until(...)
+    + template<Rep, Period> cv_status wait_for(...)
+    + template<Rep, Period, Predicate> bool wait_for(...)
+  }
+  
+  class condition_variable_any {
+    + condition_variable_any()
+    + ~condition_variable_any()
+    --
+    + void notify_one()
+    + void notify_all()
+    + template<Lockable> void wait(Lockable& lock)
+    + template<Lockable, Predicate> void wait(Lockable& lock, Predicate pred)
+    + template<Lockable, Clock, Duration> cv_status wait_until(...)
+    + template<Lockable, Clock, Duration, Predicate> bool wait_until(...)
+    + template<Lockable, Rep, Period> cv_status wait_for(...)
+    + template<Lockable, Rep, Period, Predicate> bool wait_for(...)
+  }
+}
+
+package "std::future (C++11)" {
+  class promise<T> {
+    + promise()
+    + promise(promise&& other)
+    + ~promise()
+    --
+    + promise& operator=(promise&& other)
+    + void swap(promise& other)
+    + future<T> get_future()
+    + void set_value(const T& value)
+    + void set_value(T&& value)
+    + void set_exception(exception_ptr p)
+  }
+  
+  class future<T> {
+    + future()
+    + future(future&& other)
+    + ~future()
+    --
+    + future& operator=(future&& other)
+    + shared_future<T> share()
+    + T get()
+    + bool valid() const
+    + void wait() const
+    + template<Clock, Duration> future_status wait_until(...) const
+    + template<Rep, Period> future_status wait_for(...) const
+  }
+  
+  class shared_future<T> {
+    + shared_future()
+    + shared_future(const shared_future& other)
+    + shared_future(future<T>&& other)
+    + shared_future(shared_future&& other)
+    + ~shared_future()
+    --
+    + shared_future& operator=(shared_future&& other)
+    + shared_future& operator=(const shared_future& other)
+    + const T& get() const
+    + bool valid() const
+    + void wait() const
+  }
+  
+  class packaged_task<R(Args...)> {
+    + packaged_task()
+    + packaged_task(F&& f)
+    + packaged_task(packaged_task&& other)
+    + ~packaged_task()
+    --
+    + packaged_task& operator=(packaged_task&& other)
+    + void swap(packaged_task& other)
+    + bool valid() const
+    + future<R> get_future()
+    + void operator()(Args... args)
+    + void make_ready_at_thread_exit(Args... args)
+    + void reset()
+  }
+  
+  class "std::async()" as async_function << (F,#lightgreen) function >> {
+    + template<class F, class... Args>
+      future<result_of_t<F(Args...)>> async(F&& f, Args&&... args)
+    + template<class F, class... Args>
+      future<result_of_t<F(Args...)>> async(launch policy, F&& f, Args&&... args)
+  }
+}
+
+package "std::atomic (C++11)" {
+  class atomic<T> {
+    + atomic()
+    + atomic(T desired)
+    + ~atomic()
+    --
+    + T load(memory_order order = memory_order_seq_cst) const
+    + void store(T desired, memory_order order = memory_order_seq_cst)
+    + T exchange(T desired, memory_order order = memory_order_seq_cst)
+    + bool compare_exchange_weak(T& expected, T desired, ...)
+    + bool compare_exchange_strong(T& expected, T desired, ...)
+    + T fetch_add(T, memory_order order = memory_order_seq_cst)
+    + T fetch_sub(T, memory_order order = memory_order_seq_cst)
+    + T fetch_and(T, memory_order order = memory_order_seq_cst)
+    + T fetch_or(T, memory_order order = memory_order_seq_cst)
+    + T fetch_xor(T, memory_order order = memory_order_seq_cst)
+  }
+  
+  class atomic_flag {
+    + atomic_flag()
+    + ~atomic_flag()
+    --
+    + bool test_and_set(memory_order order = memory_order_seq_cst)
+    + void clear(memory_order order = memory_order_seq_cst)
+  }
+  
+  enum memory_order {
+    memory_order_relaxed
+    memory_order_consume
+    memory_order_acquire
+    memory_order_release
+    memory_order_acq_rel
+    memory_order_seq_cst
+  }
+}
+
+' Relationships
+thread "1" o-- "1" thread_id : has
+thread .. this_thread : related
+
+mutex <|-- recursive_mutex : extends
+mutex <|-- timed_mutex : extends
+recursive_mutex <|-- recursive_timed_mutex : extends
+timed_mutex <|-- recursive_timed_mutex : extends
+mutex <|-- shared_mutex : extends
+shared_mutex <|-- shared_timed_mutex : extends
+
+lock_guard "1" o-- "1" mutex : locks
+unique_lock "1" o-- "1" mutex : locks
+shared_lock "1" o-- "1" shared_mutex : locks
+scoped_lock "1" o-- "1..*" mutex : locks multiple
+
+condition_variable "1" o-- "1" mutex : requires
+condition_variable_any "1" o-- "1..*" mutex : works with any mutex type
+
+promise "1" -- "1" future : creates
+future "1" -- "0..1" shared_future : can convert to
+packaged_task "1" -- "1" future : creates
+async_function -- future : returns
+
+atomic "1" o-- "1" memory_order : uses
+atomic_flag "1" o-- "1" memory_order : uses
+
+note bottom of thread
+  Introduced in C++11
+  Standardized language-level threading
+endnote
+
+note bottom of mutex
+  Thread synchronization primitives
+  Prevent data races
+endnote
+
+note bottom of condition_variable
+  Thread notification mechanism
+  For producer-consumer patterns
+endnote
+
+note bottom of promise
+  Asynchronous result communication
+  Single producer, single consumer
+endnote
+
+note right of async_function
+  Convenient function to launch 
+  asynchronous tasks and get futures
+endnote
+
+note bottom of atomic
+  Lock-free atomic operations
+  For building concurrent data structures
+endnote
+
+@enduml 
